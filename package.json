@@ -1,6 +1,9 @@
 {
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mysql2": "^3.24.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^1.1.1"
   },
   "name": "web2attp1",
   "version": "1.0.0",
