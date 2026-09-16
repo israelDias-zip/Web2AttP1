@@ -12,6 +12,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    // "moduleResolution": "node",                       /* Removido para compatibilidade com a versão node \*/
+    // "moduleResolution": "node",                       /* Removido para compatibilidade com a versão node \*/    
   }
 }
