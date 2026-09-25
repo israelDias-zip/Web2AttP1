@@ -6,6 +6,7 @@ import { AppDataSource } from '../data-source';
 
 const router = express.Router();
 
+// Inicializa a conexão com o banco de dados
 AppDataSource.initialize().then(()=>{
   console.log("Conexão do banco de dados realizada com sucesso!");
 }).catch((error)=>{

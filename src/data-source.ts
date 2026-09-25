@@ -3,6 +3,7 @@ import { DataSource } from "typeorm"
 
 const dialect = process.env.DB_DIALECT ?? "mysql";
 
+// Configurações do banco de dados
 export const AppDataSource = new DataSource({
     type: dialect as "mysql" | "postgres" | "mariadb" | "mongodb",
     host: process.env.DB_HOST,

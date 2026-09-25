@@ -1,5 +1,6 @@
 import express from 'express';
 
+// Cria um servidor Express
 const app = express();
 
 import login from './controllers/login';
