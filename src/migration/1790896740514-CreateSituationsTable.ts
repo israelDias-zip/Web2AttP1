@@ -33,6 +33,7 @@ export class CreateSituationsTable1790896740514 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+      await queryRunner.dropTable("situations");
     }
 
 }
