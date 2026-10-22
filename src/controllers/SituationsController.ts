@@ -4,20 +4,6 @@ import { AppDataSource } from '../data-source';
 
 const router = express.Router();
 
-router.get("/situations", async(req: Request, res: Response) => {
-  try {
-    const situationRepository = AppDataSource.getRepository(Situation);
-     const situations = await situationRepository.find();
-     res.status(200).json(situations);
-     return;
-  } catch (error) {
-    res.status(500).json({
-      message: "Erro ao buscar situações!",
-    });
-    return;
-  }
-});
-
 //Criar a lista
 router.get("/situations", async(req: Request, res: Response) => {
   try {
@@ -51,10 +37,10 @@ router.get("/situations/:id", async(req: Request, res: Response) => {
 
      res.status(200).json(situations);
      return;
-     
+
   } catch (error) {
     res.status(500).json({
-      message: "Erro ao buscar situações!",
+      message: "Erro ao visualizar situações!",
     });
     return;
   }
@@ -77,6 +63,41 @@ router.post("/situations", async (req: Request, res: Response) => {
     res.status(500).json({
       message: "Erro ao criar situação!",
     });
+  }
+});
+
+// Atualizar situação
+router.put("/situations/:id", async(req: Request, res: Response) => {
+  try {
+
+    const { id } = req.params;
+    const data = req.body;
+
+    const situationRepository = AppDataSource.getRepository(Situation);
+     const situations = await situationRepository.findOneBy({id : Number(id)});
+
+      if(!situations) {
+        res.status(404).json({
+          message: "Situação não encontrada!",
+        });
+        return;
+      }
+
+     // Atualizar os dados da situação 
+     situationRepository.merge(situations, data);
+
+     //salvar as alterações no banco de dados
+     const updatedSituation = await situationRepository.save(situations);
+     res.status(200).json({
+      message: "Situação atualizada com sucesso!",
+      situation: updatedSituation,
+    });
+     
+  } catch (error) {
+    res.status(500).json({
+      message: "Erro ao atualizar situação!",
+    });
+    return;
   }
 });
 

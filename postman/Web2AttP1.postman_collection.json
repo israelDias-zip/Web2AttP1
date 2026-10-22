@@ -1,0 +1,127 @@
+{
+  "info": {
+    "name": "Web2AttP1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Home (login)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": []
+        }
+      }
+    },
+    {
+      "name": "Situations",
+      "item": [
+        {
+          "name": "Listar situações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/situations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "situations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visualizar situação",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/situations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "situations",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar situação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/situations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "situations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nameSituation\": \"Ativo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar situação",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/situations/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "situations",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nameSituation\": \"Inativo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}
