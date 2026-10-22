@@ -8,9 +8,55 @@ const router = express.Router();
 router.get("/situations", async(req: Request, res: Response) => {
   try {
     const situationRepository = AppDataSource.getRepository(Situation);
-     const situations = await situationRepository.find();
-     res.status(200).json(situations);
-     return;
+
+    //Receber o número de página 
+    const page = Number(req.query.page) || 1;
+    
+    //Definir o número de itens por página
+    const limit = Number(req.query.limit) || 1;
+
+    //Contar o total de registros
+    const totalSituations = await situationRepository.count();
+
+    //Verificar se existem registros
+    if(totalSituations === 0) {
+      res.status(404).json({
+        message: "Nenhuma situação encontrada!",
+      });
+      return;
+    }
+
+    //calcular a última página
+    const lastPage = Math.ceil(totalSituations / limit);
+    console.log(lastPage);
+
+    //Verificar se a página solictada é válida
+    if(page > lastPage) {
+      res.status(404).json({
+        message: "Página invalida! O total de páginas é: " + lastPage,
+      });
+      return;
+    }
+
+    //calcula o offset para a consulta
+    const offset = (page - 1) * limit;
+
+    //Retornar as situações com paginação
+    const situations = await situationRepository.find({
+      take: limit,
+      skip: offset,
+      order: {id: "DESC"}
+    });
+
+    //Retornar a resposta com as situações e informações de paginação
+    res.status(200).json({
+      currentPage: page,
+      lastPage: lastPage,
+      totalSituations,
+      situations
+    });
+    return;
+    
   } catch (error) {
     res.status(500).json({
       message: "Erro ao listar situações!",
