@@ -1,9 +1,9 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { User } from "./Users";
 
 @Entity('situations')
 export class Situation {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
