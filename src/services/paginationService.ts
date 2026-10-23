@@ -1,4 +1,4 @@
-import { FindOptionsOrder, ObjectLiteral, Repository, } from "typeorm";
+import { FindOptionsOrder, FindOptionsRelations, ObjectLiteral, Repository, } from "typeorm";
 
 interface paginationResult<T> {
   error: boolean;
@@ -13,7 +13,8 @@ export class PaginationService {
     repository: Repository<T>,
     page: number = 1,
     limit: number = 10,
-    order:FindOptionsOrder<T> = {}
+    order:FindOptionsOrder<T> = {},
+    relations: FindOptionsRelations<T> = {}
   ): Promise<paginationResult<T>> {
 
     const totalRecords = await repository.count();
@@ -26,7 +27,8 @@ export class PaginationService {
     const data = await repository.find({
       take: limit,
       skip: offset,
-      order: order
+      order: order,
+      relations: relations
     });
 
     return {

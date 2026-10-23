@@ -117,6 +117,18 @@ npx typeorm migration:create src/migration/CreateSituationsTable
 npx typeorm migration:create src/migration/CreateUsersTable
 ```
 ```
+npx typeorm migration:create src/migration/CreateProductSituationsTable
+```
+```
+npx typeorm migration:create src/migration/CreateProductCategoriesTable
+```
+```
+npx typeorm migration:create src/migration/CreateProductsTable
+```
+```
+npx typeorm migration:create src/migration/RenameNameUserToNameInUsers
+```
+```
 npx typeorm migration:create src/migration/AddSlugToProducts
 ```
 ```
