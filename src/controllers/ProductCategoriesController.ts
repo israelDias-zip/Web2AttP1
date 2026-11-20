@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express';
+import * as yup from 'yup';
 import { ProductCategory } from '../entity/ProductCategories';
 import { AppDataSource } from '../data-source';
 import { PaginationService } from '../services/paginationService';
@@ -62,6 +63,15 @@ router.post("/product-categories", async (req: Request, res: Response) => {
   try {
     const data = req.body;
 
+    //Validar os dados recebidos
+    const schema = yup.object({
+      name: yup.string()
+        .required("O campo nome da categoria é obrigatório!")
+        .min(3, "O campo nome da categoria deve ter no mínimo 3 caracteres!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
+
     const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
     const productCategory = productCategoryRepository.create({ name: data.name });
     await productCategoryRepository.save(productCategory);
@@ -71,6 +81,14 @@ router.post("/product-categories", async (req: Request, res: Response) => {
       productCategory: productCategory,
     });
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erro ao criar categoria de produto!",
@@ -84,6 +102,15 @@ router.put("/product-categories/:id", async(req: Request, res: Response) => {
 
     const { id } = req.params;
     const data = req.body;
+
+    //Validar os dados recebidos
+    const schema = yup.object({
+      name: yup.string()
+        .required("O campo nome da categoria é obrigatório!")
+        .min(3, "O campo nome da categoria deve ter no mínimo 3 caracteres!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
 
     const productCategoryRepository = AppDataSource.getRepository(ProductCategory);
     const productCategory = await productCategoryRepository.findOneBy({id : Number(id)});
@@ -106,6 +133,14 @@ router.put("/product-categories/:id", async(req: Request, res: Response) => {
     });
 
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     res.status(500).json({
       message: "Erro ao atualizar categoria de produto!",
     });

@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express';
+import * as yup from 'yup';
 import { Situation } from '../entity/Situations';
 import { AppDataSource } from '../data-source';
 import { PaginationService } from '../services/paginationService';
@@ -62,6 +63,15 @@ router.post("/situations", async (req: Request, res: Response) => {
   try {
     const data = req.body;
 
+    //Validar os dados recebidos
+    const schema = yup.object({
+      nameSituation: yup.string()
+        .required("O campo nome da situação é obrigatório!")
+        .min(3, "O campo nome da situação deve ter no mínimo 3 caracteres!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
+
     const situationRepository = AppDataSource.getRepository(Situation);
     const situation = situationRepository.create({ nameSituation: data.nameSituation });
     await situationRepository.save(situation);
@@ -71,6 +81,14 @@ router.post("/situations", async (req: Request, res: Response) => {
       situation: situation,
     });
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erro ao criar situação!",
@@ -84,6 +102,15 @@ router.put("/situations/:id", async(req: Request, res: Response) => {
 
     const { id } = req.params;
     const data = req.body;
+
+    //Validar os dados recebidos
+    const schema = yup.object({
+      nameSituation: yup.string()
+        .required("O campo nome da situação é obrigatório!")
+        .min(3, "O campo nome da situação deve ter no mínimo 3 caracteres!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
 
     const situationRepository = AppDataSource.getRepository(Situation);
      const situations = await situationRepository.findOneBy({id : Number(id)});
@@ -106,6 +133,14 @@ router.put("/situations/:id", async(req: Request, res: Response) => {
     });
      
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     res.status(500).json({
       message: "Erro ao atualizar situação!",
     });

@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express';
+import * as yup from 'yup';
 import { Product } from '../entity/Products';
 import { ProductSituation } from '../entity/ProductSituations';
 import { ProductCategory } from '../entity/ProductCategories';
@@ -67,6 +68,25 @@ router.post("/products", async (req: Request, res: Response) => {
   try {
     const data = req.body;
 
+    //Validar os dados recebidos
+    const schema = yup.object({
+      name: yup.string()
+        .required("O campo nome é obrigatório!")
+        .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+      productSituationId: yup.number()
+        .typeError("O campo situação do produto deve ser um número!")
+        .required("O campo situação do produto é obrigatório!")
+        .integer("O campo situação do produto deve ser um número inteiro!")
+        .positive("O campo situação do produto deve ser um número positivo!"),
+      productCategoryId: yup.number()
+        .typeError("O campo categoria do produto deve ser um número!")
+        .required("O campo categoria do produto é obrigatório!")
+        .integer("O campo categoria do produto deve ser um número inteiro!")
+        .positive("O campo categoria do produto deve ser um número positivo!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
+
     //Verificar se a situação do produto informada existe
     const productSituationRepository = AppDataSource.getRepository(ProductSituation);
     const productSituation = await productSituationRepository.findOneBy({id: Number(data.productSituationId)});
@@ -102,6 +122,14 @@ router.post("/products", async (req: Request, res: Response) => {
       product: product,
     });
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erro ao criar produto!",
@@ -115,6 +143,22 @@ router.put("/products/:id", async(req: Request, res: Response) => {
 
     const { id } = req.params;
     const data = req.body;
+
+    //Validar os dados recebidos, os campos não enviados permanecem iguais
+    const schema = yup.object({
+      name: yup.string()
+        .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+      productSituationId: yup.number()
+        .typeError("O campo situação do produto deve ser um número!")
+        .integer("O campo situação do produto deve ser um número inteiro!")
+        .positive("O campo situação do produto deve ser um número positivo!"),
+      productCategoryId: yup.number()
+        .typeError("O campo categoria do produto deve ser um número!")
+        .integer("O campo categoria do produto deve ser um número inteiro!")
+        .positive("O campo categoria do produto deve ser um número positivo!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
 
     const productRepository = AppDataSource.getRepository(Product);
     const product = await productRepository.findOne({
@@ -168,6 +212,14 @@ router.put("/products/:id", async(req: Request, res: Response) => {
     });
 
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     res.status(500).json({
       message: "Erro ao atualizar produto!",
     });

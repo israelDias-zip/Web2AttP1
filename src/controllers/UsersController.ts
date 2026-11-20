@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express';
+import * as yup from 'yup';
 import { User } from '../entity/Users';
 import { Situation } from '../entity/Situations';
 import { AppDataSource } from '../data-source';
@@ -66,6 +67,23 @@ router.post("/users", async (req: Request, res: Response) => {
   try {
     const data = req.body;
 
+    //Validar os dados recebidos
+    const schema = yup.object({
+      name: yup.string()
+        .required("O campo nome é obrigatório!")
+        .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+      email: yup.string()
+        .required("O campo e-mail é obrigatório!")
+        .email("O campo e-mail deve ser um e-mail válido!"),
+      situationId: yup.number()
+        .typeError("O campo situação deve ser um número!")
+        .required("O campo situação é obrigatório!")
+        .integer("O campo situação deve ser um número inteiro!")
+        .positive("O campo situação deve ser um número positivo!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
+
     //Verificar se a situação informada existe
     const situationRepository = AppDataSource.getRepository(Situation);
     const situation = await situationRepository.findOneBy({id: Number(data.situationId)});
@@ -90,6 +108,14 @@ router.post("/users", async (req: Request, res: Response) => {
       user: user,
     });
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erro ao criar usuário!",
@@ -103,6 +129,20 @@ router.put("/users/:id", async(req: Request, res: Response) => {
 
     const { id } = req.params;
     const data = req.body;
+
+    //Validar os dados recebidos, os campos não enviados permanecem iguais
+    const schema = yup.object({
+      name: yup.string()
+        .min(3, "O campo nome deve ter no mínimo 3 caracteres!"),
+      email: yup.string()
+        .email("O campo e-mail deve ser um e-mail válido!"),
+      situationId: yup.number()
+        .typeError("O campo situação deve ser um número!")
+        .integer("O campo situação deve ser um número inteiro!")
+        .positive("O campo situação deve ser um número positivo!"),
+    });
+
+    await schema.validate(data, { abortEarly: false });
 
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
@@ -142,6 +182,14 @@ router.put("/users/:id", async(req: Request, res: Response) => {
     });
 
   } catch (error) {
+    //Retornar os erros de validação do yup
+    if (error instanceof yup.ValidationError) {
+      res.status(400).json({
+        message: error.errors,
+      });
+      return;
+    }
+
     res.status(500).json({
       message: "Erro ao atualizar usuário!",
     });
